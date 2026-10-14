@@ -28,6 +28,17 @@ try{
   report.scenes.push({seed:scene.seed,type:scene.type,score:scene.score.total});
  }
  check('20 successive accepted scenes rendered, screenshots captured');
+ const synthesis=await page.evaluate(async()=>{
+  const e=window.galaxyLab.engine;e.configure({sceneType:'planetary-vista',synthesis:{mode:'procedural',planets:'procedural'}});
+  const scene=await e.generateFromSeed('procedural-qa');return {recipes:scene.objects.map(o=>o.procedural),stats:e.getPerformanceStats()};
+ });
+ assert(synthesis.recipes.every(p=>p&&p.version===1&&p.detailMix===0));
+ assert(synthesis.recipes.some(p=>p.kind==='planet'));check('Pure synthesis and procedural planet rendered');
+ await page.locator('#universe canvas').screenshot({path:'reports/synthesis-mobile.png'});
+ await page.evaluate(async()=>{const e=window.galaxyLab.engine;e.configure({synthesis:{mode:'photographic',planets:'photographic'}});await e.generateFromSeed('photographic-qa');});
+ assert(await page.evaluate(()=>window.galaxyLab.engine.getCurrentScene().objects.every(o=>!o.procedural)));check('Photographic compatibility mode rendered');
+ await page.evaluate(async()=>{const e=window.galaxyLab.engine;e.configure({sceneType:'random',synthesis:{mode:'hybrid',planets:'mixed'}});await e.generateFromSeed('hybrid-qa');});
+
  assert.equal(await page.locator('#lab button:visible').count(),0);check('Pure cosmos contains zero visible controls');
  assert.equal(await page.locator('.simulator').count(),0);check('Stop simulator removed');
  const stats=await page.evaluate(()=>window.galaxyLab.engine.getPerformanceStats());report.performance=stats;

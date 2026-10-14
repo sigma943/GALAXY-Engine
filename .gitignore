@@ -18,3 +18,7 @@ apps/android-test/android/**/build/
 
 reports/actions-webgl/
 reports/galaxy-webgl-screenshots.zip
+
+reports/synthesis-preview/*.rgba
+reports/synthesis-preview/scenes.json
+reports/synthesis-preview/seed-*.jpg

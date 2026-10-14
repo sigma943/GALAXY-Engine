@@ -1,6 +1,9 @@
+import {effectiveAsset,validRecipe} from '../../generator/src/synthesis/ProceduralAstronomicalSynthesisEngine';
+export * from './MultiScaleUniverseComposer';
 import {CRITERIA, type AssetManifest, type AstroAsset, type GeneratorConfig, type Rect, type SceneObject, type Score, type UniverseScene, type Weights, type ImageMetrics} from '../../core/src/types';
 const clamp=(n:number)=>Math.max(0,Math.min(1,n));
 export function bounds(o:SceneObject, aspect:number, a:AstroAsset):Rect {
+  a=effectiveAsset(o,a);
   const ratio=a.variants.large.height/a.variants.large.width;
   const w=o.size*Math.min(1,1/aspect),h=o.size*Math.min(1,aspect)*ratio;
   const c=Math.abs(Math.cos(o.rotation)),s=Math.abs(Math.sin(o.rotation));
@@ -16,7 +19,9 @@ export class HardConstraintsValidator {
     if(!dominant.length)errors.push('no-focal-object');
     let memory=0;
     for(const o of scene.objects) {
-      const a=manifest.assets.find(a=>a.id===o.assetId);
+      if(o.procedural&&!validRecipe(o.procedural,o.kind)){errors.push('invalid-synthesis');continue;}
+      const original=manifest.assets.find(a=>a.id===o.assetId);
+      const a=original?effectiveAsset(o,original):undefined;
       if(!a){errors.push('missing-asset');continue;}
       if(!a.mask.approved || a.mask.edgeAlphaMax>0.01)errors.push('unapproved-mask');
       if(![o.x,o.y,o.size,o.rotation,o.brightness].every(Number.isFinite)||o.size<=0)errors.push('invalid-geometry');
@@ -38,7 +43,8 @@ export class HardConstraintsValidator {
 export function rasterPreview(scene:UniverseScene,manifest:AssetManifest,width=48,height=72):number[] {
   const pixels=new Array<number>(width*height).fill(0.007);
   for(const o of scene.objects) {
-    const a=manifest.assets.find(a=>a.id===o.assetId); if(!a)continue;
+    const original=manifest.assets.find(a=>a.id===o.assetId);
+      const a=original?effectiveAsset(o,original):undefined; if(!a)continue;
     const w=o.size*Math.min(1,1/scene.aspect),h=o.size*Math.min(1,scene.aspect)*a.variants.large.height/a.variants.large.width;
     const co=Math.cos(-o.rotation),si=Math.sin(-o.rotation);
     for(let y=0;y<height;y++)for(let x=0;x<width;x++) {
@@ -46,7 +52,7 @@ export function rasterPreview(scene:UniverseScene,manifest:AssetManifest,width=4
       const u=(dx*co-dy*si)/(w*scene.aspect)+0.5,v=(dx*si+dy*co)/h+0.5;
       if(u<0||v<0||u>=1||v>=1)continue;
       const l=a.metrics.luminance[Math.floor(v*16)*16+Math.floor(u*16)]??0;
-      const i=y*width+x;pixels[i]=clamp(pixels[i]!+l*o.brightness);
+      const i=y*width+x;pixels[i]=o.blendMode==='screen'?1-(1-pixels[i]!)*(1-l*o.brightness):clamp(pixels[i]!+l*o.brightness);
     }
   }
   for(const s of scene.stars) {const i=Math.min(pixels.length-1,Math.floor(s.y*height)*width+Math.floor(s.x*width));pixels[i]=clamp(pixels[i]!+s.brightness*s.size*s.size*.012);}
@@ -66,7 +72,7 @@ export class DiversityMemory {
     return this.scenes.reduce((best,prev)=>{
       const focal=scene.objects.find(o=>o.dominant),p=prev.objects.find(o=>o.dominant);
       if(!focal||!p)return best;
-      const sameAsset=focal.assetId===p.assetId?0.5:0;
+      const sameAsset=focal.procedural&&p.procedural?(focal.procedural.morphology===p.procedural.morphology?.5:0):focal.assetId===p.assetId?.5:0;
       const position=Math.max(0,1-Math.hypot(focal.x-p.x,focal.y-p.y)*3)*0.3;
       return Math.max(best,sameAsset+position+(scene.type===prev.type?0.2:0));
     },0);
@@ -76,17 +82,17 @@ export class DiversityMemory {
 export class UniverseCompositionEvaluator {
   readonly validator=new HardConstraintsValidator();
   evaluate(scene:UniverseScene, manifest:AssetManifest, c:GeneratorConfig, preview=false):Score {
-    const assets=scene.objects.map(o=>manifest.assets.find(a=>a.id===o.assetId)).filter((a):a is AstroAsset=>!!a);
-    const focal=scene.objects.find(o=>o.dominant),fa=assets.find(a=>a.id===focal?.assetId);
+    const assets=scene.objects.map(o=>{const a=manifest.assets.find(a=>a.id===o.assetId);return a?effectiveAsset(o,a):undefined;}).filter((a):a is AstroAsset=>!!a);
+    const focal=scene.objects.find(o=>o.dominant),source=manifest.assets.find(a=>a.id===focal?.assetId),fa=focal&&source?effectiveAsset(focal,source):undefined;
     const fb=focal&&fa?bounds(focal,scene.aspect,fa):{x:0,y:0,width:0,height:0};
     const thirds=focal?Math.min(...[1/3,2/3].flatMap(x=>[1/3,2/3].map(y=>Math.hypot(focal.x-x,focal.y-y)))):1;
     let collisions=0,coverage=0,sx=0,sy=0,mass=0,occlusion=0;
     scene.objects.forEach((o,i)=>{
-      const a=assets.find(a=>a.id===o.assetId);if(!a)return;
+      const source=manifest.assets.find(a=>a.id===o.assetId);if(!source)return;const a=effectiveAsset(o,source);
       const b=bounds(o,scene.aspect,a),weight=b.width*b.height*o.brightness*(0.25+a.metrics.contrast);
       coverage+=b.width*b.height*(o.kind==='nebula'?0.65:0.55);sx+=o.x*weight;sy+=o.y*weight;mass+=weight;
       c.safeZones.forEach(z=>occlusion+=overlap(b,z)*o.brightness*(z.weight??1));
-      scene.objects.slice(i+1).forEach(p=>{const pa=assets.find(a=>a.id===p.assetId);if(pa&&o.kind!=='nebula'&&p.kind!=='nebula')collisions+=overlap(b,bounds(p,scene.aspect,pa))/Math.max(0.01,b.width*b.height);});
+      scene.objects.slice(i+1).forEach(p=>{const source=manifest.assets.find(a=>a.id===p.assetId);const pa=source?effectiveAsset(p,source):undefined;if(pa&&o.kind!=='nebula'&&p.kind!=='nebula')collisions+=overlap(b,bounds(p,scene.aspect,pa))/Math.max(.01,Math.sqrt(b.width*b.height*bounds(p,scene.aspect,pa).width*bounds(p,scene.aspect,pa).height));});
     });
     const visible=overlap(fb,{x:0,y:0,width:1,height:1})/Math.max(0.0001,fb.width*fb.height);
     const balance=mass?Math.hypot(sx/mass-0.5,sy/mass-0.5):1;
@@ -108,8 +114,9 @@ export class UniverseCompositionEvaluator {
     const darkFraction=pixels.length?pixels.filter(p=>p<0.055).length/pixels.length:0;
     const similarity=preview?new ReferenceImageQualityEvaluator().compare(pixels,manifest.reference):0;
     const structureCoverage=preview?1-darkFraction:Math.min(1,coverage*.45);
-    const occupancy=clamp(structureCoverage/.48);
-    ratios.negativeSpace=clamp(1-Math.abs(structureCoverage-.5)*1.6);
+    const targetCoverage=c.nebulae.enabled?.48:.16;
+    const occupancy=clamp(structureCoverage/targetCoverage);
+    ratios.negativeSpace=clamp(1-Math.abs(structureCoverage-targetCoverage)*1.4);
     ratios.depth=clamp(.25+occupancy*.5+(preview?clamp(contrast/.14):.85)*.25);
     ratios.focal=clamp(ratios.focal*(.65+.35*occupancy));
     ratios.coherence*=.7+.3*occupancy;
@@ -124,3 +131,5 @@ export class UniverseCompositionEvaluator {
     return {total,breakdown,maximum,violations,accepted:!violations.length&&total>=c.minScore,referenceSimilarity:similarity,preview:{darkFraction,contrast,mean}};
   }
 }
+
+export * from './VisualQualityIntelligence';
