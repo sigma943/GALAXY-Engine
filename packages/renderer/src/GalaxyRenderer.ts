@@ -1,3 +1,5 @@
+import {effectiveAsset} from '../../generator/src/synthesis/ProceduralAstronomicalSynthesisEngine';
+import {bakeSynthesisTexture} from './SynthesisTexture';
 import {Application,Container,Sprite,Texture,ImageSource,Geometry,Mesh,MeshGeometry,Shader,GlProgram,UniformGroup} from 'pixi.js';
 import type {AssetManifest,AstroAsset,PerformanceStats,Quality,SceneObject,UniverseScene} from '../../core/src/types';
 import {MeteorEngine} from './MeteorEngine';
@@ -5,7 +7,7 @@ import {starVertex,starFragment,meteorVertex,meteorFragment} from './shaders';
 export const PROFILES:Record<Quality,{resolution:number;variant:'small'|'medium'|'large';stars:number}>={
   low:{resolution:1,variant:'medium',stars:.5},medium:{resolution:1.5,variant:'medium',stars:.75},high:{resolution:2,variant:'large',stars:1},ultra:{resolution:2.5,variant:'large',stars:1}
 };
-type Entry={image:HTMLImageElement;texture?:Texture;bytes:number};
+type Entry={image:HTMLImageElement|HTMLCanvasElement;texture?:Texture;bytes:number};
 type Photo={sprite:Sprite;object:SceneObject;asset:AstroAsset};
 type Layer={container:Container;photos:Photo[];stars:Mesh<Geometry,Shader>;starUniforms:ReturnType<typeof starUniforms>;paths:string[];scene:UniverseScene};
 function starUniforms(){return new UniformGroup({uResolution:{value:new Float32Array([1,1]),type:'vec2<f32>'},uView:{value:new Float32Array([0,0,1,1]),type:'vec4<f32>'},uTime:{value:0,type:'f32'},uGlow:{value:.65,type:'f32'},uTwinkle:{value:1,type:'f32'},uAlpha:{value:1,type:'f32'}});}
@@ -60,18 +62,33 @@ export class GalaxyRenderer {
     if(this.app)entry.texture=new Texture({source:new ImageSource({resource:image,alphaMode:'premultiply-alpha-on-upload',autoGenerateMipmaps:true,scaleMode:'linear'})});
     this.cache.set(url,entry);return entry;
   }
+  private objectPath(o:SceneObject,a:AstroAsset):string {
+    return o.procedural?'synthesis:'+this.quality+':'+o.assetId+':'+JSON.stringify(o.procedural):this.url(a,o.dominant);
+  }
+  private async loadObject(o:SceneObject,a:AstroAsset):Promise<Entry>{
+    const path=this.objectPath(o,a),cached=this.cache.get(path);if(cached)return cached;
+    if(!o.procedural)return this.load(path);
+    let source:HTMLImageElement|undefined;
+    if(o.procedural.detailMix>0&&o.kind!=='planet'){source=new Image();source.src=new URL(a.variants.small.path,this.baseUrl).href;await source.decode();}
+    const limit={low:384,medium:512,high:768,ultra:1024}[this.quality];
+    const size=Math.min(this.maxTexture,o.kind==='galaxy'&&!o.dominant?Math.max(128,Math.round(limit*o.size)):o.kind==='nebula'?Math.min(limit,512):limit);
+    const image=await bakeSynthesisTexture(o.procedural,size,source,()=>!this.disposed);
+    const entry:Entry={image,bytes:size*size*4*1.34};
+    if(this.app)entry.texture=new Texture({source:new ImageSource({resource:image,alphaMode:'premultiply-alpha-on-upload',autoGenerateMipmaps:true,scaleMode:'linear'})});
+    this.cache.set(path,entry);return entry;
+  }
   async setScene(scene:UniverseScene):Promise<void> {
     const assets=scene.objects.map(o=>{const a=this.manifest.assets.find(a=>a.id===o.assetId);if(!a)throw new Error('Missing asset '+o.assetId);return a;});
-    const paths=assets.map((a,i)=>this.url(a,scene.objects[i]!.dominant));
+    const paths=assets.map((a,i)=>this.objectPath(scene.objects[i]!,a));
     let entries:Entry[];
-    try {entries=await Promise.all(paths.map(p=>this.load(p)));}
+    try {entries=[];for(let i=0;i<assets.length;i++)entries.push(await this.loadObject(scene.objects[i]!,assets[i]!));}
     catch(e){this.prune(new Set([...(this.layer?.paths??[]),...(this.oldLayer?.paths??[])]));throw e;}
     if(this.disposed)return;
     if(this.app) {
       const container=new Container(),photos:Photo[]=[];
       const uniforms=starUniforms(),stars=this.makeStars(scene,uniforms);
       let starsAdded=false;
-      scene.objects.forEach((o,i)=>{if(o.kind!=='nebula'&&!starsAdded){container.addChild(stars);starsAdded=true;}const sprite=new Sprite(entries[i]!.texture);sprite.anchor.set(.5);sprite.alpha=Math.min(1,o.brightness);sprite.blendMode=o.blendMode??'normal';photos.push({sprite,object:o,asset:assets[i]!});container.addChild(sprite);});
+      scene.objects.forEach((o,i)=>{if(o.kind!=='nebula'&&!starsAdded){container.addChild(stars);starsAdded=true;}const sprite=new Sprite(entries[i]!.texture);sprite.anchor.set(.5);sprite.alpha=Math.min(1,o.brightness);sprite.blendMode=o.blendMode??'normal';photos.push({sprite,object:o,asset:effectiveAsset(o,assets[i]!)});container.addChild(sprite);});
       if(!starsAdded)container.addChild(stars);
       const layer:Layer={container,photos,stars,starUniforms:uniforms,paths,scene};
       if(this.oldLayer)this.disposeLayer(this.oldLayer);
@@ -116,7 +133,8 @@ export class GalaxyRenderer {
     const canvas=document.createElement('canvas');canvas.width=this.canvas.width;canvas.height=this.canvas.height;const ctx=canvas.getContext('2d')!;const scale=canvas.width/this.width;ctx.scale(scale,scale);ctx.fillStyle='#02040b';ctx.fillRect(0,0,this.width,this.height);
     const f=this.frame(this.current);
     for(const s of this.current.stars){ctx.fillStyle='#'+s.color.toString(16).padStart(6,'0');ctx.globalAlpha=s.brightness;ctx.fillRect(f.x+s.x*f.w,f.y+s.y*f.h,Math.max(.5,s.size),Math.max(.5,s.size));}
-    for(const o of this.current.objects){const a=this.manifest.assets.find(a=>a.id===o.assetId)!;const image=this.cache.get(this.url(a,o.dominant))?.image;if(!image)continue;const w=o.size*Math.min(f.w,f.h),h=w*image.height/image.width;ctx.save();ctx.translate(f.x+o.x*f.w,f.y+o.y*f.h);ctx.rotate(o.rotation);ctx.globalCompositeOperation=o.blendMode==='screen'?'screen':'source-over';ctx.globalAlpha=Math.min(1,o.brightness);ctx.drawImage(image,-w/2,-h/2,w,h);ctx.restore();}
+    ctx.globalAlpha=1;
+    for(const o of this.current.objects){const a=this.manifest.assets.find(a=>a.id===o.assetId)!;const image=this.cache.get(this.objectPath(o,a))?.image;if(!image)continue;const w=o.size*Math.min(f.w,f.h),h=w*image.height/image.width;ctx.save();ctx.translate(f.x+o.x*f.w,f.y+o.y*f.h);ctx.rotate(o.rotation);ctx.globalCompositeOperation=o.blendMode==='screen'?'screen':'source-over';ctx.globalAlpha=Math.min(1,o.brightness);ctx.drawImage(image,-w/2,-h/2,w,h);ctx.restore();}
     this.fallbackBackground=canvas;
   }
   resize(w:number,h:number):void {
@@ -129,7 +147,7 @@ export class GalaxyRenderer {
   setPointer(x:number,y:number):void {this.pointer.x=x;this.pointer.y=y;}
   screenshot():string {return this.canvas.toDataURL('image/webp',.85);}
   getStats():Partial<PerformanceStats> {return {renderer:this.app?'webgl2':'canvas2d',gpu:this.gpu,renderWidth:this.canvas.width,renderHeight:this.canvas.height,textures:this.cache.size,estimatedTextureMB:[...this.cache.values()].reduce((n,e)=>n+e.bytes,0)/1048576,drawCalls:null,cpuSubmitMs:this.cpuMs,quality:this.quality};}
-  private prune(keep:Set<string>):void {for(const [url,e] of this.cache)if(!keep.has(url)){e.texture?.destroy(true);e.image.src='';this.cache.delete(url);}}
+  private prune(keep:Set<string>):void {for(const [url,e] of this.cache)if(!keep.has(url)){e.texture?.destroy(true);if(e.image instanceof HTMLImageElement)e.image.src='';else {e.image.width=0;e.image.height=0;}this.cache.delete(url);}}
   private disposeLayer(l:Layer):void {l.stars.geometry.destroy();l.stars.shader?.destroy(true);l.container.destroy({children:true});}
   destroy():void {if(this.disposed)return;this.disposed=true;if(this.layer)this.disposeLayer(this.layer);if(this.oldLayer)this.disposeLayer(this.oldLayer);this.meteorMesh?.geometry.destroy();this.meteorMesh?.shader?.destroy(true);if(this.appReady)this.app?.destroy(true,{children:true});this.prune(new Set());this.canvas?.remove();this.current=undefined;this.fallbackBackground=undefined;}
 }

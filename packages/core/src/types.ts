@@ -13,10 +13,20 @@ export interface AstroAsset {
   metrics: ImageMetrics;
 }
 export interface AssetManifest { version: string; assets: AstroAsset[]; reference: ImageMetrics }
+export type PhotometricProfile = 'scientific' | 'cinematic';
+export interface SynthesisConfig { mode: 'photographic' | 'hybrid' | 'procedural'; profile: PhotometricProfile; planets: 'photographic' | 'procedural' | 'mixed'; detailMix: number }
+export interface ProceduralRecipe {
+ version: 1; kind: ObjectKind; seed: number;
+ morphology: 'spiral' | 'barred' | 'elliptical' | 'lenticular' | 'irregular' | 'edge-on' | 'interacting';
+ inclination: number; arms: number; twist: number; phase: number; hue: number;
+ surface: 'rock' | 'gas' | 'ice' | 'ocean'; rings: boolean; light: [number,number,number];
+ profile: PhotometricProfile; detailMix: number;
+}
 export interface SceneObject {
   assetId: string; kind: ObjectKind; x: number; y: number; size: number; rotation: number;
   brightness: number; depth: number; dominant: boolean;
   blendMode?: 'normal' | 'screen';
+  procedural?: ProceduralRecipe;
 }
 export interface Star { x: number; y: number; size: number; brightness: number; color: number; phase: number; depth: number }
 export const CRITERIA = ['composition','coherence','naturalness','balance','focal','readability','depth','harmony','negativeSpace'] as const;
@@ -29,6 +39,7 @@ export interface UniverseScene {
   config: GeneratorConfig; candidateIndex: number;
 }
 export interface GeneratorConfig {
+  synthesis: SynthesisConfig;
   sceneType: SceneType | 'random'; candidates: number; minScore: number; weights: Weights;
   sceneProbabilities: Record<SceneType, number>; safeZones: Rect[]; aspect: number; memoryBudgetMB: number;
   stars: { density: number; brightness: number; glow: number; twinkle: boolean };
@@ -36,7 +47,8 @@ export interface GeneratorConfig {
   planets: { enabled: boolean; frequency: number; maxSize: number; preferredTypes: string[] };
   nebulae: { enabled: boolean; frequency: number; brightness: number; intensity: number };
 }
-export type GeneratorPatch = Partial<Omit<GeneratorConfig,'stars'|'galaxies'|'planets'|'nebulae'>> & {
+export type GeneratorPatch = Partial<Omit<GeneratorConfig,'stars'|'galaxies'|'planets'|'nebulae'|'synthesis'>> & {
+  synthesis?: Partial<SynthesisConfig>;
   stars?: Partial<GeneratorConfig['stars']>; galaxies?: Partial<GeneratorConfig['galaxies']>;
   planets?: Partial<GeneratorConfig['planets']>; nebulae?: Partial<GeneratorConfig['nebulae']>;
 };

@@ -1,4 +1,57 @@
-# Galaxy Engine 5.1.1 + Galaxy Lab
+# Galaxy Engine 6.0.0 + Galaxy Lab
+
+## Procedural Astronomical Synthesis — 6.0
+
+Galaxy Lab domyślnie tworzy struktury kosmosu z seeda. Fotografie są źródłem subtelnej modulacji detali, a nie sylwetek galaktyk i mgławic. To artystyczny model inspirowany astronomią, nie symulacja fizyczna ani obserwacja NASA.
+
+- `ProceduralGalaxyGenerator`: spiralne i poprzeczkowe dyski, eliptyczne, soczewkowate, nieregularne, widziane z boku i oddziałujące; jądra, ramiona, absorpcja pyłu i obszary emisyjne.
+- `VolumetricNebulaGenerator`: warstwy 2.5D, wieloskalowy seeded value noise/fBm z domain warping, pola emisji i absorpcji, włókna i wygaszanie brzegów. Palety emisji są spójne w scenie.
+- `ProceduralPlanetGenerator`: światy skaliste z kraterami, gazowe z pasami i burzami, lodowe oraz oceaniczne z chmurami; terminator, wspólna kierunkowa iluminacja, atmosferyczny brzeg i przybliżone pierścienie z przesłanianiem/cieniem. Rzeczywiste planety nadal korzystają z lokalnych fotografii z ich oryginalnym oświetleniem.
+- `MultiScaleUniverseComposer`: główna galaktyka ma najwyżej 0.98 krótszego wymiaru ekranu, mniejsze struktury tworzą hierarchię skal. Ustawienia częstotliwości ograniczają dodatkowe galaktyki i planety.
+- `NASAStylePhotometricRenderer`: synteza emisji w przestrzeni liniowej, HDR w obliczeniach tekstury, Reinhard tone mapping, dwa profile i deterministyczny dithering. Nie jest to pełnoekranowy floating-point HDR pipeline: Pixi nadal miesza gotowe tekstury w przestrzeni wyświetlania. Delikatne poświaty są częścią modelu emisji; nie dodano kosztownego postprocessingu bloom.
+- `VisualQualityIntelligence`: diagnostyka kontrastu, szczegółów, ciemnej przestrzeni, świateł i zakresu skali; ocena kompozycji używa luminancji wygenerowanych pól. Punktacja pozostaje heurystyką, bez modelu AI i bez gwarancji jakości fotograficznej.
+
+### Tryby
+
+W panelu Scena wybierz **Tworzenie kosmosu**, **Kolor i światło** oraz **Planety**. Zmiany ustawień dotyczą kolejnej generacji.
+
+```ts
+engine.configure({
+  synthesis: {
+    mode: 'hybrid',       // hybrid | procedural | photographic
+    profile: 'cinematic', // cinematic | scientific
+    planets: 'mixed',     // mixed | procedural | photographic
+    detailMix: 0.18,      // 0–0.35; czysta synteza zawsze używa 0
+  },
+});
+await engine.generateFromSeed('nowy-wszechswiat');
+```
+
+Tryb `photographic` zachowuje fotograficzną architekturę 5.1, ale nie jest odtwarzaniem dawnych seedów: generator ma nową wersję. Zapisy 5.1.1 pozostają w lokalnym archiwum; ich wczytanie jest odrzucane jawnie jako niekompatybilne. Wersja 6.0 zapisuje pełne parametry obiektów, w tym światło i seed każdego pola.
+
+Tekstury są wypalane tylko przy zmianie sceny, w porcjach oddających sterowanie do UI, z cache i zwalnianiem zasobów. Granice rozdzielczości: główne obiekty 384–1024 px zależnie od jakości; mgławice najwyżej 512 px; satelitarne galaktyki mają mniejsze tekstury. Jedna gwiezdna geometria GPU i ten sam wypalony obraz w Canvas fallback. Stara scena pozostaje widoczna do ukończenia nowej. Cięższe przygotowywanie atlasów offline i wyższa szczegółowość są dalszym kierunkiem optymalizacji; koszt CPU wypalania na fizycznym telefonie wymaga pomiaru.
+
+### Walidacja i podglądy 6.0
+
+```bash
+npm ci
+npm run typecheck
+npm test
+npm run benchmark
+npm run build:engine
+npm run android:sync
+# rzeczywisty WebGL/Canvas i 20 kolejnych seedów:
+npx playwright install --with-deps chromium
+npm run test:browser
+# podglądy samych pól offline (Python + Pillow):
+node --import tsx tools/benchmark/synthesis-preview.ts
+python3 tools/benchmark/synthesis-preview.py
+```
+
+Podglądy offline: `reports/synthesis-preview/contact-sheet.jpg`. Pomijają modulację detalami fotografii i efekty GPU; nie zastępują zrzutów WebGL ani testów urządzenia. Benchmark raportuje generowanie parametrów/kompozycji, nie czas wypalania tekstur. GitHub Actions uruchamia walidację, WebGL i budowanie APK również dla pull requestów. Brak obrazu referencyjnego w tym wdrożeniu: nie przeprowadzono kalibracji do konkretnej referencji ani treningu modelu estetycznego.
+
+## Zachowane API i architektura 5.1
+
 
 Osobny silnik fotograficznego kosmosu w TypeScript i samodzielne laboratorium Vite/Capacitor. Jedna globalna scena, jeden canvas; React jest opcjonalnym adapterem. Repozytorium aplikacji przystankowej nie zostało zmodyfikowane.
 
@@ -145,6 +198,8 @@ Wykrywanie „naklejki” i piękna nie jest automatycznym dowodem jakości. Wal
 
 Typy scen i prawdopodobieństwa: Galaxy Showcase 25%, Planetary Vista 20%, Nebula Landscape 20%, Deep Space 15%, Galaxy & Planet 15%, Cinematic Space 5%. Wartości można zmieniać przez `configure({sceneProbabilities: ...})`.
 
+Opis fotograficznego trybu poniżej pochodzi z 5.1. W 6.0 dochodzą zapisane receptury syntezy i ustawienia profilu.
+
 Deterministyczność zależy od **seeda + konfiguracji + aspect + wersji generatora i zdjęć**. Zmiana rozmiaru lub trybu UI nie uruchamia generatora; renderer zachowuje proporcje wygenerowanej przestrzeni. Przy zmianie orientacji fotografie pozostają w tej samej kompozycji, kotwice są znormalizowane do całego ekranu. Dla automatycznej generacji pamięć ostatnich ośmiu scen obniża ocenę podobnych nowych seedów. Jawne odtwarzanie seeda pomija tę pamięć, aby nie zmieniać wyniku.
 
 ## Fotografie i maskowanie
@@ -186,8 +241,8 @@ Symulator przystanków został usunięty na żądanie użytkownika. Otwieranie/z
 npm run build:engine
 npm run pack:engine
 # w oddzielnym projekcie:
-npm install /path/galaxy-engine-core-5.1.1.tgz
-npm install /path/galaxy-engine-react-5.1.1.tgz
+npm install /path/galaxy-engine-core-6.0.0.tgz
+npm install /path/galaxy-engine-react-6.0.0.tgz
 ```
 
 Pakiety zawierają ESM i deklaracje TypeScript. Core zawiera także `assets/manifest.json`, tekstury i podpisy. Skopiuj `node_modules/@galaxy-engine/core/assets` do `public/galaxy-assets` swojej aplikacji. Nie kopiuj Galaxy Lab.

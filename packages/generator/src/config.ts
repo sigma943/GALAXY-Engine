@@ -1,5 +1,6 @@
 import type {GeneratorConfig, GeneratorPatch} from '../../core/src/types';
 export const DEFAULT_CONFIG: GeneratorConfig = {
+  synthesis:{mode:'hybrid',profile:'cinematic',planets:'mixed',detailMix:.18},
   sceneType:'random', candidates:20, minScore:85, aspect:0.65, memoryBudgetMB:160,
   weights:{composition:20,coherence:15,naturalness:15,balance:10,focal:10,readability:10,depth:10,harmony:5,negativeSpace:5},
   sceneProbabilities:{'galaxy-showcase':25,'planetary-vista':20,'nebula-landscape':20,'deep-space':15,'galaxy-planet':15,'cinematic-space':5},
@@ -9,7 +10,9 @@ export const DEFAULT_CONFIG: GeneratorConfig = {
   nebulae:{enabled:true,frequency:1,brightness:0.95,intensity:0.9}
 };
 export function configure(base: GeneratorConfig, patch: GeneratorPatch): GeneratorConfig {
-  const c={...base,...patch,stars:{...base.stars,...patch.stars},galaxies:{...base.galaxies,...patch.galaxies},planets:{...base.planets,...patch.planets},nebulae:{...base.nebulae,...patch.nebulae}};
+  const c={...base,...patch,synthesis:{...DEFAULT_CONFIG.synthesis,...base.synthesis,...patch.synthesis},stars:{...base.stars,...patch.stars},galaxies:{...base.galaxies,...patch.galaxies},planets:{...base.planets,...patch.planets},nebulae:{...base.nebulae,...patch.nebulae}};
+  if(!['photographic','hybrid','procedural'].includes(c.synthesis.mode)||!['scientific','cinematic'].includes(c.synthesis.profile)||!['photographic','procedural','mixed'].includes(c.synthesis.planets)||!Number.isFinite(c.synthesis.detailMix))throw new Error('Invalid synthesis settings');
+  c.synthesis.detailMix=Math.max(0,Math.min(.35,c.synthesis.detailMix));
   if (!Number.isFinite(c.aspect) || c.aspect<=0) throw new Error('Aspect must be positive');
   c.candidates=Math.max(12,Math.min(24,Math.round(c.candidates)));
   c.minScore=Math.max(0,Math.min(100,c.minScore));
