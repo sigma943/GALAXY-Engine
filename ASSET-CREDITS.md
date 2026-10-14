@@ -123,13 +123,13 @@ Warunki: CC BY 4.0 — https://esawebb.org/copyright/
 
 ## Saturn
 
-NASA, ESA, A. Simon (GSFC) and the OPAL Team, and J. DePasquale (STScI)
+NASA/JPL/Space Science Institute
 
-Źródło: https://esahubble.org/images/heic1814b/
+Źródło: https://science.nasa.gov/photojournal/the-greatest-saturn-portrait-yet/
 
-Pobranie: https://cdn.esahubble.org/archives/images/large/heic1814b.jpg
+Pobranie: https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia06/pia06193/PIA06193.jpg
 
-Warunki: CC BY 4.0 — https://esahubble.org/copyright/
+Warunki: NASA/JPL image use policy — https://www.jpl.nasa.gov/jpl-image-use-policy/
 
 ## Jupiter
 

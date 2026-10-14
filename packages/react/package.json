@@ -1,6 +1,6 @@
 {
   "name": "@galaxy-engine/react",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "type": "module",
   "license": "MIT",
   "files": [
@@ -16,6 +16,6 @@
   },
   "peerDependencies": {
     "react": ">=18",
-    "@galaxy-engine/core": "^5.0.0"
+    "@galaxy-engine/core": "^5.1.0"
   }
 }

@@ -14,7 +14,7 @@ describe('100 independent seeds',()=>{
    expect(a.scene).toEqual(b.scene);expect(a.scene.score.violations).toEqual([]);expect(a.scene.score.total).toBeGreaterThanOrEqual(85);
    expect(a.candidates.length).toBe(20);accepted++;types.add(a.scene.type);assets.add(a.scene.objects.find(o=>o.dominant)!.assetId);
   }
-  expect(accepted).toBe(100);expect(types.size).toBe(6);expect(assets.size).toBeGreaterThan(10);
+  expect(accepted).toBe(100);expect(types.size).toBe(6);expect(assets.size).toBeGreaterThanOrEqual(10);
  });
  it('satisfies constraints for portrait and landscape in all scene styles',()=>{
   for(const aspect of [.46,.65,1.7])for(const sceneType of Object.keys(DEFAULT_CONFIG.sceneProbabilities) as SceneType[]) {

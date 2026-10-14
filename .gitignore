@@ -11,6 +11,10 @@ browser-trace.log
 consumer-check/
 reports/gallery/scenes.json
 *.tgz
+__pycache__/
 apps/android-test/android/.gradle/
 apps/android-test/android/local.properties
 apps/android-test/android/**/build/
+
+reports/actions-webgl/
+reports/galaxy-webgl-screenshots.zip

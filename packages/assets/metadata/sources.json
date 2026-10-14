@@ -148,12 +148,12 @@
     "name": "Saturn",
     "kind": "planet",
     "subtype": "ringed",
-    "source": "https://esahubble.org/images/heic1814b/",
-    "originalUrl": "https://cdn.esahubble.org/archives/images/large/heic1814b.jpg",
-    "credit": "NASA, ESA, A. Simon (GSFC) and the OPAL Team, and J. DePasquale (STScI)",
-    "license": "CC BY 4.0",
-    "licenseUrl": "https://esahubble.org/copyright/",
-    "raw": "saturn.jpg"
+    "source": "https://science.nasa.gov/photojournal/the-greatest-saturn-portrait-yet/",
+    "originalUrl": "https://assets.science.nasa.gov/content/dam/science/psd/photojournal/pia/pia06/pia06193/PIA06193.jpg",
+    "credit": "NASA/JPL/Space Science Institute",
+    "license": "NASA/JPL image use policy",
+    "licenseUrl": "https://www.jpl.nasa.gov/jpl-image-use-policy/",
+    "raw": "saturn-cassini.jpg"
   },
   {
     "id": "jupiter",

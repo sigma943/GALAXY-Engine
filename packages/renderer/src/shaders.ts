@@ -23,9 +23,9 @@ void main(){
  vec2 p=(vUV-.5)*14.0;
  float r=length(p);
  float core=exp(-r*r*2.3);
- float halo=exp(-r*r*.19)*.10*uGlow;
+ float halo=exp(-r*r*.19)*.16*uGlow;
  float cross=exp(-abs(p.x)*7.0-abs(p.y)*.9)+exp(-abs(p.y)*7.0-abs(p.x)*.9);
- float spike=vData.x>1.4?cross*.10:0.0;
+ float spike=vData.x>1.4?cross*.28:0.0;
  float flicker=1.0+sin(uTime*.7+vData.z)*.08*uTwinkle;
  float alpha=clamp((core+halo+spike)*vData.y*flicker,0.0,1.0)*uAlpha;
  finalColor=vec4(vColor*alpha,alpha);

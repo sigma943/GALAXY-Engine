@@ -20,7 +20,7 @@ SOURCES = [
  ('veil','Veil Nebula','nebula','remnant','esahubble.org','heic1520a'),
  ('tarantula','Tarantula Nebula','nebula','emission','esawebb.org','weic2212a'),
  ('ngc3324','NGC 3324 · Cosmic Cliffs','nebula','emission','esawebb.org','weic2205a'),
- ('saturn','Saturn','planet','ringed','esahubble.org','heic1814b'),
+ # Saturn is supplied by the Cassini photojournal entry below.
  ('jupiter','Jupiter','planet','gas','esahubble.org','heic2017a'),
  ('mars','Mars','planet','rocky','esahubble.org','heic1814c'),
  ('uranus-neptune','Uranus / Neptune','planet','ice','esahubble.org','heic2209a'),
@@ -62,16 +62,19 @@ if __name__=='__main__':
    rows.append(row); print(row['id'],row['credit'],flush=True)
  # NASA spacecraft observations, no third-party credit in their source caption.
  extras=[
+  ('saturn','Saturn','https://science.nasa.gov/photojournal/the-greatest-saturn-portrait-yet/','NASA/JPL/Space Science Institute','PIA06193'),
   ('venus','Venus','https://science.nasa.gov/image-detail/venus-mariner-10-pia23791-fig2-2/','NASA/JPL-Caltech','pia23791'),
   ('earth','Earth','https://www.nasa.gov/image-article/blue-marble-image-of-earth-from-apollo-17/','NASA','blue')
  ]
  for id,name,page,credit,hint in extras:
   html=get(page); soup=BeautifulSoup(html,'html.parser')
-  if id=='venus':
+  if id=='saturn':
+   urls=[a.get('href') for a in soup.find_all('a') if '.jpg' in a.get('href','') and 'PIA06193' in a.get('href','').upper()]
+  elif id=='venus':
    urls=[a.get('href') for a in soup.find_all('a') if a.get_text(strip=True)=='Download']
   else:
    urls=[img.get('src') for img in soup.find_all('img') if 'earth' in str(img).lower() and ('blue' in str(img).lower() or 'apollo' in str(img).lower())]
   if not urls: raise ValueError(id+' image URL missing')
   url=urls[0]; (RAW/f'{id}.jpg').write_bytes(get(url)); (RAW/f'{id}.html').write_bytes(html)
-  rows.append(dict(id=id,name=name,kind='planet',subtype='rocky',source=page,originalUrl=url,credit=credit,license='NASA media usage guidelines; JPL image use policy for Venus',licenseUrl='https://www.nasa.gov/nasa-brand-center/images-and-media/',raw=f'{id}.jpg'))
+  rows.append(dict(id=id,name=name,kind='planet',subtype='ringed' if id=='saturn' else 'rocky',source=page,originalUrl=url,credit=credit,license='NASA media usage guidelines; JPL image use policy for Venus',licenseUrl='https://www.nasa.gov/nasa-brand-center/images-and-media/',raw=f'{id}.jpg'))
  (ROOT/'packages/assets/metadata/sources.json').write_text(json.dumps(rows,indent=2,ensure_ascii=False))

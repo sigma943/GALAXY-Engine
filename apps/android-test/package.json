@@ -1,1 +1,11 @@
-{"name":"galaxy-lab-android","version":"5.0.0","private":true,"type":"module","dependencies":{"@capacitor/core":"8.5.3","@capacitor/android":"8.5.3","@capacitor/app":"8.1.2"}}
+{
+  "name": "galaxy-lab-android",
+  "version": "5.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@capacitor/core": "8.5.3",
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2"
+  }
+}

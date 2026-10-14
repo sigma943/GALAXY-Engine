@@ -1,14 +1,16 @@
-# Galaxy Engine 5.0 + Galaxy Lab
+# Galaxy Engine 5.1 + Galaxy Lab
 
 Osobny silnik fotograficznego kosmosu w TypeScript i samodzielne laboratorium Vite/Capacitor. Jedna globalna scena, jeden canvas; React jest opcjonalnym adapterem. Repozytorium aplikacji przystankowej nie zostało zmodyfikowane.
 
-## Stan weryfikacji
+## Zmiana kierunku w wersji 5.1
 
-Zaimplementowany kod, działający generator i ukończone buildy biblioteki oraz aplikacji WWW. Lokalnie: strict TypeScript i 12 testów Vitest przeszły; benchmark 100 seedów zaakceptował 100 scen. Szczegóły w `reports/100-seeds.json`.
+Pierwsza wersja 5.0 przeszła testy techniczne i kompilację APK, ale została odrzucona przez użytkownika ze względu na pusty kadr, zbyt małe i miękkie obiekty, wygląd fotografii jako naklejek oraz rozbudowany HUD. Nie stanowi zaakceptowanego wzorca jakości.
 
-**Nie uznawaj projektu za wizualnie zaakceptowany wyłącznie na podstawie punktacji.** W pierwotnym środowisku Chromium kończył start sygnałem SIGTRAP, a lokalna Java nie uruchamiała się z powodu brakującego `libjli.so`. Testy WebGL i budowanie APK przeniesiono do GitHub Actions. Wynik ich konkretnego uruchomienia należy sprawdzić w zakładce Actions; samo istnienie workflow nie oznacza poprawnej kompilacji.
+Wersja 5.1 usuwa cały symulator przystanków, duże opisy obiektów i stały pasek z oceną. Kontrolki są niewielkie; ustawienia otwierają się na żądanie. Czysty widok nie zawiera żadnych widocznych przycisków, a dotknięcie ekranu przywraca sterowanie.
 
-`reports/gallery.html` pokazuje pierwsze 20 kolejnych seedów, bez wybierania najlepszych zdjęć. Obecne pliki `offline-seed-*.jpg` są podglądami kompozycji z Pillow, **nie zrzutami WebGL**. Workflow przeglądarkowy generuje rzeczywiste zrzuty w `seed-*.png`.
+Nowy generator komponuje duże galaktyki i rozległe fotograficzne warstwy pyłu/mgławic, z gęstszym polem gwiazd. Zdjęcia galaktyk mają warianty do 4096 px, ostrość lokalną i maski wyznaczane z konturu emisji, bez geometrycznych elips. Mgławice wykorzystują mieszanie screen. Galaktyki zachowują ciemne pasma pyłu wewnątrz swojej sylwetki i przezroczyste tło; planety zachowują normalny tryb oraz rzeczywistą sylwetkę. Saturn pochodzi teraz z wysokiej rozdzielczości mozaiki Cassini PIA06193. Dwa materiały (M104 i NGC3982) zostały wyłączone z generatora po kontroli wizualnej masek; ich obecne tło nie wtapia się wystarczająco dobrze w mgławice.
+
+Heurystyka kompozycji odrzuca kadry z niewystarczającym pokryciem widocznymi strukturami i zbyt małym kontrastem. Punktacja pozostaje diagnostyką i nie dowodzi zgodności estetycznej z referencją. Przed wydaniem trzeba przejrzeć rzeczywiste zrzuty WebGL z bieżącego uruchomienia CI.
 
 ## Uruchomienie Galaxy Lab
 
@@ -121,7 +123,7 @@ Zapisy są lokalne (`localStorage`), maksymalnie 30 kompozycji. Pełne sceny zaw
 1. Seed jest hashowany FNV-1a; losowania używają Mulberry32. Osobne strumienie dla typu sceny, każdego kandydata, gwiazd i meteorów.
 2. Tworzone jest 12–24 lekkich kandydatów (domyślnie 20). Zasoby nie są dekodowane dla każdego kandydata.
 3. Oceniane są pozycje względem trójpodziału, kolizje, widoczność, masa wizualna, pokrycie, strefy UI oraz dane zdjęć.
-4. Prosty hill climbing do czterech kroków poprawia pozycję głównego obiektu słabszych kandydatów.
+4. Prosty hill climbing w maksymalnie trzech krokach zwiększa jasność i zasięg fotograficznych warstw słabszych kandydatów; zmiana jest przyjmowana tylko wtedy, gdy poprawia wynik bez zwiększania liczby naruszeń.
 5. Pięciu najlepszych kandydatów otrzymuje proxy 48×72 z rzeczywistych map luminancji zdjęć. Kontrolowane są kontrast i ciemna przestrzeń; histogram referencji pozostaje diagnostyką.
 6. Najlepsza zaakceptowana scena otrzymuje pełne tekstury. Poprzedni obraz pozostaje do ukończenia ładowania, a przejście używa crossfade. W razie błędu poprzednia scena zostaje zachowana.
 
@@ -143,7 +145,7 @@ Wykrywanie „naklejki” i piękna nie jest automatycznym dowodem jakości. Wal
 
 Typy scen i prawdopodobieństwa: Galaxy Showcase 25%, Planetary Vista 20%, Nebula Landscape 20%, Deep Space 15%, Galaxy & Planet 15%, Cinematic Space 5%. Wartości można zmieniać przez `configure({sceneProbabilities: ...})`.
 
-Deterministyczność zależy od **seeda + konfiguracji + aspect + wersji generatora i zdjęć**. Zmiana rozmiaru lub trybu UI nie uruchamia generatora; renderer zachowuje proporcje wygenerowanej przestrzeni. Przy zmianie orientacji fotografie pozostają w tej samej kompozycji, a wolne pasy mają kolor globalnego tła. Dla automatycznej generacji pamięć ostatnich ośmiu scen obniża ocenę podobnych nowych seedów. Jawne odtwarzanie seeda pomija tę pamięć, aby nie zmieniać wyniku.
+Deterministyczność zależy od **seeda + konfiguracji + aspect + wersji generatora i zdjęć**. Zmiana rozmiaru lub trybu UI nie uruchamia generatora; renderer zachowuje proporcje wygenerowanej przestrzeni. Przy zmianie orientacji fotografie pozostają w tej samej kompozycji, kotwice są znormalizowane do całego ekranu. Dla automatycznej generacji pamięć ostatnich ośmiu scen obniża ocenę podobnych nowych seedów. Jawne odtwarzanie seeda pomija tę pamięć, aby nie zmieniać wyniku.
 
 ## Fotografie i maskowanie
 
@@ -151,7 +153,7 @@ Galaktyki: M51, M101, NGC 1300, M104, NGC 3982. Mgławice: Carina, Orion, Eagle,
 
 Źródła to oficjalne strony ESA/Hubble i ESA/Webb prezentujące obserwacje NASA/ESA/CSA oraz NASA dla Ziemi i Wenus. Pełne podpisy, adresy oryginałów i warunki użycia znajdują się w [ASSET-CREDITS.md](ASSET-CREDITS.md). Obrazy ESA mają CC BY 4.0; materiały NASA/JPL zachowują własne warunki. MIT dotyczy kodu, nie fotografii. Nie używamy logo NASA/ESA ani nie sugerujemy ich poparcia.
 
-Fotografie mają lokalne warianty small/medium/large (do 768/1536/2560 px, bez powiększania oryginału). Maski używają estymacji czerni, szerokiego podparcia luminancji, ochrony ciemnych wnętrz, miękkiego wygaszania i alfa. Planety są **fotografiami z zachowanym oryginalnym oświetleniem**, bez dynamicznych faz/obrotu 3D. Pierścienie Saturna są częścią obserwacji, więc ich szczegóły i przesłanianie zachowuje zdjęcie. Nie stosujemy imitacji galaktyk SVG/CSS ani sztucznych kolorowych elips pierścieni.
+Fotografie mają lokalne warianty small/medium/large (do 768/1536/4096 (galaktyki); pozostałe do 2560 px, bez powiększania oryginału). Maski używają estymacji czerni, szerokiego podparcia luminancji, ochrony ciemnych wnętrz, miękkiego wygaszania i alfa. Planety są **fotografiami z zachowanym oryginalnym oświetleniem**, bez dynamicznych faz/obrotu 3D. Pierścienie Saturna są częścią obserwacji, więc ich szczegóły i przesłanianie zachowuje zdjęcie. Nie stosujemy imitacji galaktyk SVG/CSS ani sztucznych kolorowych elips pierścieni.
 
 Odtworzenie pipeline (tylko narzędzia offline):
 
@@ -174,9 +176,9 @@ AUTO wykorzystuje liczbę wątków jako punkt startowy, a następnie rzeczywiste
 
 ## Galaxy Lab
 
-Panel zawiera kontrolę seeda, rodzaju sceny, jakości, gwiazd, galaktyk, planet, mgławic i meteorów. „Czysty kosmos” ukrywa HUD. „Podgląd aplikacji” pokazuje wyszukiwarkę, filtry PKS/MPK, karty przystanków, oznaczenia linii, ulubione i nawigację. Przełącznik dodaje wyłącznie HTML; nie tworzy drugiego canvas ani nowego seeda. Strefy meteorów uwzględniają podgląd.
+Pełnoekranowy kosmos, niewielki przycisk nowej kompozycji, zapisu i otwierania sterowania. Panel zawiera seedy, rodzaje scen, jakość, galaktyki, planety, mgławice, gwiazdy, meteory, ocenę kompozycji i parametry wydajności. Archiwum umożliwia ocenę 1–5 i porównanie dwóch scen.
 
-Composition Explorer pokazuje zapisane miniatury, seedy, wynik, oceny 1–5, odrzucanie i porównanie A/B. Zakładka kandydatów pokazuje pięć najlepszych propozycji. Generacyjne strefy czytelności definiuje `generator.safeZones`; zmiana podglądu nie przesuwa istniejących obiektów. Symulator nie jest implementacją rzeczywistego rozkładu jazdy.
+Symulator przystanków został usunięty na żądanie użytkownika. Otwieranie/zamykanie panelu i ukrywanie UI nie zmieniają seeda ani sceny. Czysty widok nie ma żadnych widocznych kontrolek; dotknięcie ekranu lub Escape przywraca UI.
 
 ## Biblioteka npm i React / Next.js
 
@@ -184,8 +186,8 @@ Composition Explorer pokazuje zapisane miniatury, seedy, wynik, oceny 1–5, odr
 npm run build:engine
 npm run pack:engine
 # w oddzielnym projekcie:
-npm install /path/galaxy-engine-core-5.0.0.tgz
-npm install /path/galaxy-engine-react-5.0.0.tgz
+npm install /path/galaxy-engine-core-5.1.0.tgz
+npm install /path/galaxy-engine-react-5.1.0.tgz
 ```
 
 Pakiety zawierają ESM i deklaracje TypeScript. Core zawiera także `assets/manifest.json`, tekstury i podpisy. Skopiuj `node_modules/@galaxy-engine/core/assets` do `public/galaxy-assets` swojej aplikacji. Nie kopiuj Galaxy Lab.
@@ -230,6 +232,6 @@ npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-Playwright sprawdza rzeczywisty WebGL 2, przełączanie UI bez zmiany sceny, orientację, zapisy, start/stop, reduced motion, kontekst, lokalność zasobów, Canvas fallback i sprzątanie canvas. Tworzy 20 zrzutów kolejnych seedów. Przy niedostępnym `WEBGL_lose_context` raport jawnie oznacza pominięcie. Testy cyklu życia Vitest korzystają z mocka renderera; nie udowadniają braku wycieków pamięci GPU. Długotrwały pomiar na telefonie i ocena estetyczna są nadal otwarte.
+Playwright sprawdza rzeczywisty WebGL 2, przełączanie panelu bez zmiany sceny, orientację, zapisy, start/stop, reduced motion, kontekst, lokalność zasobów, Canvas fallback i sprzątanie canvas. Tworzy 20 zrzutów kolejnych seedów. Przy niedostępnym `WEBGL_lose_context` raport jawnie oznacza pominięcie. Testy cyklu życia Vitest korzystają z mocka renderera; nie udowadniają braku wycieków pamięci GPU. Długotrwały pomiar na telefonie i ocena estetyczna są nadal otwarte.
 
 Licencja kodu: MIT. Fotografie: zobacz pełne warunki per zasób w ASSET-CREDITS.md.

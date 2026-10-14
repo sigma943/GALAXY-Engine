@@ -16,6 +16,7 @@ export interface AssetManifest { version: string; assets: AstroAsset[]; referenc
 export interface SceneObject {
   assetId: string; kind: ObjectKind; x: number; y: number; size: number; rotation: number;
   brightness: number; depth: number; dominant: boolean;
+  blendMode?: 'normal' | 'screen';
 }
 export interface Star { x: number; y: number; size: number; brightness: number; color: number; phase: number; depth: number }
 export const CRITERIA = ['composition','coherence','naturalness','balance','focal','readability','depth','harmony','negativeSpace'] as const;

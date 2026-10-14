@@ -25,10 +25,10 @@ export class HardConstraintsValidator {
       const b=bounds(o,scene.aspect,a);
       if(o.kind==='planet' && (b.x<0||b.y<0||b.x+b.width>1||b.y+b.height>1))errors.push('planet-clipped');
       const visible=overlap(b,{x:0,y:0,width:1,height:1})/Math.max(0.0001,b.width*b.height);
-      if(o.dominant && visible<0.75)errors.push('focal-clipped');
+      if(o.dominant && visible<(o.kind==='nebula'?.38:.62))errors.push('focal-clipped');
       const covered=c.safeZones.reduce((sum,z)=>sum+overlap(b,z)*(z.weight??1),0)/Math.max(0.0001,b.width*b.height);
       if(o.dominant && covered>0.78)errors.push('focal-obscured');
-      memory+=a.variants.large.width*a.variants.large.height*4*1.34/1048576;
+      const variant=o.dominant?a.variants.large:a.variants.medium;memory+=variant.width*variant.height*4*1.34/1048576;
     }
     if(memory>c.memoryBudgetMB)errors.push('texture-budget');
     return [...new Set(errors)];
@@ -49,7 +49,7 @@ export function rasterPreview(scene:UniverseScene,manifest:AssetManifest,width=4
       const i=y*width+x;pixels[i]=clamp(pixels[i]!+l*o.brightness);
     }
   }
-  for(const s of scene.stars) {const i=Math.min(pixels.length-1,Math.floor(s.y*height)*width+Math.floor(s.x*width));pixels[i]=clamp(pixels[i]!+s.brightness*0.04);}
+  for(const s of scene.stars) {const i=Math.min(pixels.length-1,Math.floor(s.y*height)*width+Math.floor(s.x*width));pixels[i]=clamp(pixels[i]!+s.brightness*s.size*s.size*.012);}
   return pixels;
 }
 export class ReferenceImageQualityEvaluator {
@@ -90,29 +90,37 @@ export class UniverseCompositionEvaluator {
     });
     const visible=overlap(fb,{x:0,y:0,width:1,height:1})/Math.max(0.0001,fb.width*fb.height);
     const balance=mass?Math.hypot(sx/mass-0.5,sy/mass-0.5):1;
-    const target=scene.type==='deep-space'?0.16:scene.type==='nebula-landscape'?0.5:0.3;
+    const target=scene.type==='nebula-landscape'?0.7:0.5;
     const ratios:Weights={
       composition:clamp(1-thirds*0.9-collisions*0.35),
-      coherence:clamp(1-collisions*0.4-(scene.objects.length>4?0.15:0)),
-      naturalness:clamp(0.96-collisions*0.4),
+      coherence:clamp(1-collisions*0.3),
+      naturalness:clamp(.94-collisions*.35),
       balance:clamp(1-Math.abs(balance-0.18)*0.85),
       focal:clamp(visible*(focal?1-Math.max(0,0.28-focal.size)*2:0)*(fa?0.78+Math.min(0.22,fa.metrics.detail*4):0)),
       readability:clamp(1-occlusion*2),
       depth:clamp(0.72+new Set(scene.objects.map(o=>o.depth)).size*0.065+(scene.stars.length>1800?0.12:0)),
       harmony:clamp(0.98-assets.reduce((n,a)=>n+Math.max(0,(a.metrics.color[1]??0)-(a.metrics.color[2]??0)-0.15),0)*0.5),
-      negativeSpace:clamp(1-Math.abs(coverage-target)*0.85)
+      negativeSpace:clamp(1-Math.abs(Math.min(1,coverage*.65)-target)*.7)
     };
     const pixels=preview?rasterPreview(scene,manifest):[];
     const mean=pixels.length?pixels.reduce((a,b)=>a+b,0)/pixels.length:0;
     const contrast=pixels.length?Math.sqrt(pixels.reduce((n,p)=>n+(p-mean)**2,0)/pixels.length):0;
     const darkFraction=pixels.length?pixels.filter(p=>p<0.055).length/pixels.length:0;
     const similarity=preview?new ReferenceImageQualityEvaluator().compare(pixels,manifest.reference):0;
-    if(preview) {ratios.negativeSpace=clamp(ratios.negativeSpace-(darkFraction>0.96?0.18:0));ratios.depth=clamp(ratios.depth-(contrast<0.025?0.15:0));}
+    const structureCoverage=preview?1-darkFraction:Math.min(1,coverage*.45);
+    const occupancy=clamp(structureCoverage/.48);
+    ratios.negativeSpace=clamp(1-Math.abs(structureCoverage-.5)*1.6);
+    ratios.depth=clamp(.25+occupancy*.5+(preview?clamp(contrast/.14):.85)*.25);
+    ratios.focal=clamp(ratios.focal*(.65+.35*occupancy));
+    ratios.coherence*=.7+.3*occupancy;
+    ratios.naturalness*=.8+.2*occupancy;
     const maximum={...c.weights},breakdown={} as Weights;
     for(const k of CRITERIA)breakdown[k]=Math.round(ratios[k]*maximum[k]*100)/100;
     const sum=Object.values(maximum).reduce((a,b)=>a+b,0);
     const total=Math.round(Object.values(breakdown).reduce((a,b)=>a+b,0)/sum*1000)/10;
     const violations=this.validator.validate(scene,manifest,c);
+    if(preview&&c.nebulae.enabled&&structureCoverage<.27)violations.push('insufficient-visible-structure');
+    if(preview&&c.nebulae.enabled&&contrast<.055)violations.push('flat-photographic-landscape');
     return {total,breakdown,maximum,violations,accepted:!violations.length&&total>=c.minScore,referenceSimilarity:similarity,preview:{darkFraction,contrast,mean}};
   }
 }

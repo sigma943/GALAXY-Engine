@@ -3,7 +3,7 @@ import type {AssetManifest,AstroAsset,PerformanceStats,Quality,SceneObject,Unive
 import {MeteorEngine} from './MeteorEngine';
 import {starVertex,starFragment,meteorVertex,meteorFragment} from './shaders';
 export const PROFILES:Record<Quality,{resolution:number;variant:'small'|'medium'|'large';stars:number}>={
-  low:{resolution:.8,variant:'medium',stars:.55},medium:{resolution:1,variant:'medium',stars:.75},high:{resolution:1.5,variant:'large',stars:1},ultra:{resolution:2,variant:'large',stars:1}
+  low:{resolution:1,variant:'medium',stars:.5},medium:{resolution:1.5,variant:'medium',stars:.75},high:{resolution:2,variant:'large',stars:1},ultra:{resolution:2.5,variant:'large',stars:1}
 };
 type Entry={image:HTMLImageElement;texture?:Texture;bytes:number};
 type Photo={sprite:Sprite;object:SceneObject;asset:AstroAsset};
@@ -41,12 +41,14 @@ export class GalaxyRenderer {
   }
   private resolution():number {return Math.min(window.devicePixelRatio||1,PROFILES[this.quality].resolution);}
   private frame(scene:UniverseScene):{x:number;y:number;w:number;h:number} {
-    const w=Math.min(this.width,this.height*scene.aspect),h=w/scene.aspect;
-    return {x:(this.width-w)/2,y:(this.height-h)/2,w,h};
+    // Anchors are normalized; portraits and landscapes both fill one global canvas.
+    void scene;
+    return {x:0,y:0,w:this.width,h:this.height};
   }
   private url(a:AstroAsset,dominant:boolean):string {
     let key=PROFILES[this.quality].variant;
-    if(dominant&&a.kind==='galaxy'&&this.quality==='low')key='medium';
+    if(dominant&&this.quality!=='low')key='large';
+    if(!dominant)key='medium';
     while(Math.max(a.variants[key].width,a.variants[key].height)>this.maxTexture&&key!=='small')key=key==='large'?'medium':'small';
     return new URL(a.variants[key].path,this.baseUrl).href;
   }
@@ -67,8 +69,10 @@ export class GalaxyRenderer {
     if(this.disposed)return;
     if(this.app) {
       const container=new Container(),photos:Photo[]=[];
-      const uniforms=starUniforms(),stars=this.makeStars(scene,uniforms);container.addChild(stars);
-      scene.objects.forEach((o,i)=>{const sprite=new Sprite(entries[i]!.texture);sprite.anchor.set(.5);sprite.alpha=Math.min(1,o.brightness);photos.push({sprite,object:o,asset:assets[i]!});container.addChild(sprite);});
+      const uniforms=starUniforms(),stars=this.makeStars(scene,uniforms);
+      let starsAdded=false;
+      scene.objects.forEach((o,i)=>{if(o.kind!=='nebula'&&!starsAdded){container.addChild(stars);starsAdded=true;}const sprite=new Sprite(entries[i]!.texture);sprite.anchor.set(.5);sprite.alpha=Math.min(1,o.brightness);sprite.blendMode=o.blendMode??'normal';photos.push({sprite,object:o,asset:assets[i]!});container.addChild(sprite);});
+      if(!starsAdded)container.addChild(stars);
       const layer:Layer={container,photos,stars,starUniforms:uniforms,paths,scene};
       if(this.oldLayer)this.disposeLayer(this.oldLayer);
       this.oldLayer=this.layer;this.layer=layer;this.fade=this.oldLayer&&!this.reduced?0:1;
@@ -112,7 +116,7 @@ export class GalaxyRenderer {
     const canvas=document.createElement('canvas');canvas.width=this.canvas.width;canvas.height=this.canvas.height;const ctx=canvas.getContext('2d')!;const scale=canvas.width/this.width;ctx.scale(scale,scale);ctx.fillStyle='#02040b';ctx.fillRect(0,0,this.width,this.height);
     const f=this.frame(this.current);
     for(const s of this.current.stars){ctx.fillStyle='#'+s.color.toString(16).padStart(6,'0');ctx.globalAlpha=s.brightness;ctx.fillRect(f.x+s.x*f.w,f.y+s.y*f.h,Math.max(.5,s.size),Math.max(.5,s.size));}
-    for(const o of this.current.objects){const a=this.manifest.assets.find(a=>a.id===o.assetId)!;const image=this.cache.get(this.url(a,o.dominant))?.image;if(!image)continue;const w=o.size*Math.min(f.w,f.h),h=w*image.height/image.width;ctx.save();ctx.translate(f.x+o.x*f.w,f.y+o.y*f.h);ctx.rotate(o.rotation);ctx.globalAlpha=Math.min(1,o.brightness);ctx.drawImage(image,-w/2,-h/2,w,h);ctx.restore();}
+    for(const o of this.current.objects){const a=this.manifest.assets.find(a=>a.id===o.assetId)!;const image=this.cache.get(this.url(a,o.dominant))?.image;if(!image)continue;const w=o.size*Math.min(f.w,f.h),h=w*image.height/image.width;ctx.save();ctx.translate(f.x+o.x*f.w,f.y+o.y*f.h);ctx.rotate(o.rotation);ctx.globalCompositeOperation=o.blendMode==='screen'?'screen':'source-over';ctx.globalAlpha=Math.min(1,o.brightness);ctx.drawImage(image,-w/2,-h/2,w,h);ctx.restore();}
     this.fallbackBackground=canvas;
   }
   resize(w:number,h:number):void {

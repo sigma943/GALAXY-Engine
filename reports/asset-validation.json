@@ -6,343 +6,343 @@
       "asset": "m51",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 148356
+      "bytes": 198634
     },
     {
       "asset": "m51",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 620254
+      "bytes": 893786
     },
     {
       "asset": "m51",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 1847802
+      "bytes": 6900848
     },
     {
       "asset": "m101",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 202970
+      "bytes": 250770
     },
     {
       "asset": "m101",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 844284
+      "bytes": 1142138
     },
     {
       "asset": "m101",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 2454424
+      "bytes": 8656356
     },
     {
       "asset": "ngc1300",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 130644
+      "bytes": 169738
     },
     {
       "asset": "ngc1300",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 550096
+      "bytes": 747724
     },
     {
       "asset": "ngc1300",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 1590306
+      "bytes": 6492620
     },
     {
       "asset": "m104",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 55870
+      "bytes": 75172
     },
     {
       "asset": "m104",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 235932
+      "bytes": 389426
     },
     {
       "asset": "m104",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 850656
+      "bytes": 2828400
     },
     {
       "asset": "ngc3982",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 262616
+      "bytes": 354686
     },
     {
       "asset": "ngc3982",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 654068
+      "bytes": 735762
     },
     {
       "asset": "ngc3982",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 654068
+      "bytes": 735762
     },
     {
       "asset": "carina",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 100968
+      "bytes": 135178
     },
     {
       "asset": "carina",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 335074
+      "bytes": 481368
     },
     {
       "asset": "carina",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 806206
+      "bytes": 1222062
     },
     {
       "asset": "orion",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 119048
+      "bytes": 155680
     },
     {
       "asset": "orion",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 446198
+      "bytes": 509488
     },
     {
       "asset": "orion",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 902004
+      "bytes": 1143446
     },
     {
       "asset": "eagle",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 149418
+      "bytes": 230538
     },
     {
       "asset": "eagle",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 668394
+      "bytes": 1102448
     },
     {
       "asset": "eagle",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 2079362
+      "bytes": 3442536
     },
     {
       "asset": "lagoon",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 111886
+      "bytes": 152582
     },
     {
       "asset": "lagoon",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 338382
+      "bytes": 554036
     },
     {
       "asset": "lagoon",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 906892
+      "bytes": 1600696
     },
     {
       "asset": "veil",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 141146
+      "bytes": 160448
     },
     {
       "asset": "veil",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 524172
+      "bytes": 601514
     },
     {
       "asset": "veil",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 1330532
+      "bytes": 1617234
     },
     {
       "asset": "tarantula",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 129120
+      "bytes": 178800
     },
     {
       "asset": "tarantula",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 484430
+      "bytes": 690544
     },
     {
       "asset": "tarantula",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 1208676
+      "bytes": 1797968
     },
     {
       "asset": "ngc3324",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 136280
+      "bytes": 192076
     },
     {
       "asset": "ngc3324",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 471582
+      "bytes": 674558
     },
     {
       "asset": "ngc3324",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 1063140
+      "bytes": 1596692
     },
     {
       "asset": "saturn",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 39794
+      "bytes": 38696
     },
     {
       "asset": "saturn",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 68628
+      "bytes": 109392
     },
     {
       "asset": "saturn",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 68628
+      "bytes": 207544
     },
     {
       "asset": "jupiter",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 108702
+      "bytes": 162446
     },
     {
       "asset": "jupiter",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 218468
+      "bytes": 385374
     },
     {
       "asset": "jupiter",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 218468
+      "bytes": 385374
     },
     {
       "asset": "mars",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 51664
+      "bytes": 82732
     },
     {
       "asset": "mars",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 51664
+      "bytes": 82732
     },
     {
       "asset": "mars",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 51664
+      "bytes": 82732
     },
     {
       "asset": "venus",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 56880
+      "bytes": 87148
     },
     {
       "asset": "venus",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 87572
+      "bytes": 140706
     },
     {
       "asset": "venus",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 87572
+      "bytes": 140706
     },
     {
       "asset": "earth",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 187392
+      "bytes": 264414
     },
     {
       "asset": "earth",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 292884
+      "bytes": 416194
     },
     {
       "asset": "earth",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 292884
+      "bytes": 416194
     },
     {
       "asset": "uranus",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 32886
+      "bytes": 39118
     },
     {
       "asset": "uranus",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 35142
+      "bytes": 41770
     },
     {
       "asset": "uranus",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 35142
+      "bytes": 41770
     },
     {
       "asset": "neptune",
       "variant": "small",
       "edgeAlpha": 0.0,
-      "bytes": 29534
+      "bytes": 35002
     },
     {
       "asset": "neptune",
       "variant": "medium",
       "edgeAlpha": 0.0,
-      "bytes": 32606
+      "bytes": 38688
     },
     {
       "asset": "neptune",
       "variant": "large",
       "edgeAlpha": 0.0,
-      "bytes": 32606
+      "bytes": 38688
     }
   ]
 }

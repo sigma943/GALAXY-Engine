@@ -17,17 +17,19 @@ try{
  const initial=await page.evaluate(()=>({seed:window.galaxyLab.engine.getCurrentSeed(),objects:window.galaxyLab.engine.getCurrentScene().objects,stats:window.galaxyLab.engine.getPerformanceStats()}));
  assert.equal(initial.stats.renderer,'webgl2');check('Actual WebGL 2 initialization and shader draw');
  await page.waitForTimeout(600);await page.screenshot({path:'reports/lab-mobile.png'});
- await page.evaluate(()=>{window.galaxyLab.engine.pause();window.galaxyLab.setPreview(true);});
- assert.deepEqual(await page.evaluate(()=>window.galaxyLab.engine.getCurrentScene().objects),initial.objects);assert.equal(await page.evaluate(()=>document.querySelectorAll('#universe canvas').length),1);check('Preview toggle preserves seed, geometry and one canvas');
- await page.screenshot({path:'reports/app-preview-mobile.png'});
+ await page.evaluate(()=>{window.galaxyLab.engine.pause();window.galaxyLab.setPanel(true);});
+ assert.deepEqual(await page.evaluate(()=>window.galaxyLab.engine.getCurrentScene().objects),initial.objects);assert.equal(await page.evaluate(()=>document.querySelectorAll('#universe canvas').length),1);check('Control panel preserves seed, geometry and one canvas');
+ await page.screenshot({path:'reports/lab-controls-mobile.png'});
  await page.setViewportSize({width:932,height:430});assert.deepEqual(await page.evaluate(()=>window.galaxyLab.engine.getCurrentScene().objects),initial.objects);check('Orientation resize preserves static scene');
- await page.setViewportSize({width:430,height:932});await page.evaluate(()=>{window.galaxyLab.setPreview(false);window.galaxyLab.setClean(true);window.galaxyLab.engine.resume();});
+ await page.setViewportSize({width:430,height:932});await page.evaluate(()=>{window.galaxyLab.setPanel(false);window.galaxyLab.setClean(true);window.galaxyLab.engine.resume();});
  for(let i=0;i<20;i++){
   const scene=await page.evaluate(async(seed)=>{window.galaxyLab.engine.setSceneType('random');return await window.galaxyLab.engine.generateFromSeed(seed);},i);
   await page.waitForTimeout(550);await page.locator('#universe canvas').screenshot({path:`reports/gallery/seed-${String(i).padStart(2,'0')}.png`});
   report.scenes.push({seed:scene.seed,type:scene.type,score:scene.score.total});
  }
  check('20 successive accepted scenes rendered, screenshots captured');
+ assert.equal(await page.locator('#lab button:visible').count(),0);check('Pure cosmos contains zero visible controls');
+ assert.equal(await page.locator('.simulator').count(),0);check('Stop simulator removed');
  const stats=await page.evaluate(()=>window.galaxyLab.engine.getPerformanceStats());report.performance=stats;
  const id=await page.evaluate(()=>window.galaxyLab.engine.saveCurrentUniverse());
  const beforeSave=await page.evaluate(()=>window.galaxyLab.engine.getCurrentScene());
