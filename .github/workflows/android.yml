@@ -1,0 +1,90 @@
+name: Galaxy Lab — APK and validation
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: galaxy-lab-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run benchmark
+      - run: npm run build:engine
+      - run: npm run pack:engine
+      - uses: actions/upload-artifact@v6
+        with:
+          name: galaxy-engine-library
+          path: '*.tgz'
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        with:
+          name: seed-benchmark
+          path: reports/100-seeds.json
+  android:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android 36 SDK
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - run: npm ci
+      - run: npm run android:sync
+      - name: Build debug APK
+        working-directory: apps/android-test/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Prepare APK
+        run: cp apps/android-test/android/app/build/outputs/apk/debug/app-debug.apk Galaxy-Lab-debug.apk
+      - uses: actions/upload-artifact@v6
+        with:
+          name: Galaxy-Lab-debug-APK
+          path: Galaxy-Lab-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+  browser:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: node tools/stage-assets.mjs
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: browser-report-and-screenshots
+          path: |
+            reports/browser-tests.json
+            reports/gallery/seed-*.png
+            reports/*mobile.png
+          if-no-files-found: warn

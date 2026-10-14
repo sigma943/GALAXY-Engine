@@ -1,0 +1,348 @@
+{
+  "status": "passed",
+  "variants": 57,
+  "rows": [
+    {
+      "asset": "m51",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 148356
+    },
+    {
+      "asset": "m51",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 620254
+    },
+    {
+      "asset": "m51",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 1847802
+    },
+    {
+      "asset": "m101",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 202970
+    },
+    {
+      "asset": "m101",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 844284
+    },
+    {
+      "asset": "m101",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 2454424
+    },
+    {
+      "asset": "ngc1300",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 130644
+    },
+    {
+      "asset": "ngc1300",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 550096
+    },
+    {
+      "asset": "ngc1300",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 1590306
+    },
+    {
+      "asset": "m104",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 55870
+    },
+    {
+      "asset": "m104",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 235932
+    },
+    {
+      "asset": "m104",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 850656
+    },
+    {
+      "asset": "ngc3982",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 262616
+    },
+    {
+      "asset": "ngc3982",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 654068
+    },
+    {
+      "asset": "ngc3982",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 654068
+    },
+    {
+      "asset": "carina",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 100968
+    },
+    {
+      "asset": "carina",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 335074
+    },
+    {
+      "asset": "carina",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 806206
+    },
+    {
+      "asset": "orion",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 119048
+    },
+    {
+      "asset": "orion",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 446198
+    },
+    {
+      "asset": "orion",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 902004
+    },
+    {
+      "asset": "eagle",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 149418
+    },
+    {
+      "asset": "eagle",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 668394
+    },
+    {
+      "asset": "eagle",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 2079362
+    },
+    {
+      "asset": "lagoon",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 111886
+    },
+    {
+      "asset": "lagoon",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 338382
+    },
+    {
+      "asset": "lagoon",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 906892
+    },
+    {
+      "asset": "veil",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 141146
+    },
+    {
+      "asset": "veil",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 524172
+    },
+    {
+      "asset": "veil",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 1330532
+    },
+    {
+      "asset": "tarantula",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 129120
+    },
+    {
+      "asset": "tarantula",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 484430
+    },
+    {
+      "asset": "tarantula",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 1208676
+    },
+    {
+      "asset": "ngc3324",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 136280
+    },
+    {
+      "asset": "ngc3324",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 471582
+    },
+    {
+      "asset": "ngc3324",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 1063140
+    },
+    {
+      "asset": "saturn",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 39794
+    },
+    {
+      "asset": "saturn",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 68628
+    },
+    {
+      "asset": "saturn",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 68628
+    },
+    {
+      "asset": "jupiter",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 108702
+    },
+    {
+      "asset": "jupiter",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 218468
+    },
+    {
+      "asset": "jupiter",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 218468
+    },
+    {
+      "asset": "mars",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 51664
+    },
+    {
+      "asset": "mars",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 51664
+    },
+    {
+      "asset": "mars",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 51664
+    },
+    {
+      "asset": "venus",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 56880
+    },
+    {
+      "asset": "venus",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 87572
+    },
+    {
+      "asset": "venus",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 87572
+    },
+    {
+      "asset": "earth",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 187392
+    },
+    {
+      "asset": "earth",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 292884
+    },
+    {
+      "asset": "earth",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 292884
+    },
+    {
+      "asset": "uranus",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 32886
+    },
+    {
+      "asset": "uranus",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 35142
+    },
+    {
+      "asset": "uranus",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 35142
+    },
+    {
+      "asset": "neptune",
+      "variant": "small",
+      "edgeAlpha": 0.0,
+      "bytes": 29534
+    },
+    {
+      "asset": "neptune",
+      "variant": "medium",
+      "edgeAlpha": 0.0,
+      "bytes": 32606
+    },
+    {
+      "asset": "neptune",
+      "variant": "large",
+      "edgeAlpha": 0.0,
+      "bytes": 32606
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@galaxy-engine/core",
+  "version": "5.0.0",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "dist",
+    "assets",
+    "ASSET-CREDITS.md"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "pixi.js": "8.22.0"
+  }
+}

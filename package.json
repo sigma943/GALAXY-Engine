@@ -1,0 +1,51 @@
+{
+  "name": "galaxy-engine-5-workspace",
+  "version": "5.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/core",
+    "packages/generator",
+    "packages/composition",
+    "packages/renderer",
+    "packages/react"
+  ],
+  "scripts": {
+    "dev": "vite --config apps/demo/vite.config.ts --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:browser": "node tools/benchmark/browser.mjs",
+    "benchmark": "node --import tsx tools/benchmark/seeds.ts",
+    "build": "npm run typecheck && vite build --config apps/demo/vite.config.ts",
+    "build:engine": "node tools/build-library.mjs",
+    "android:add": "cd apps/android-test && cap add android",
+    "android:sync": "npm run build && cd apps/android-test && cap sync android",
+    "android:open": "cd apps/android-test && cap open android",
+    "android:apk": "npm run android:sync && cd apps/android-test/android && ./gradlew assembleDebug",
+    "assets:prepare": "python3 tools/image-processing/prepare.py",
+    "pack:engine": "npm pack ./packages/core && npm pack ./packages/react",
+    "predev": "node tools/stage-assets.mjs",
+    "prebuild": "node tools/stage-assets.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
+    "pixi.js": "8.22.0",
+    "react": "19.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "@types/node": "24.10.0",
+    "@types/react": "19.2.2",
+    "happy-dom": "21.0.1",
+    "playwright": "1.64.1",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.4",
+    "vitest": "5.0.4"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}

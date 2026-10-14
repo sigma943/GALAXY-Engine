@@ -1,0 +1,16 @@
+node_modules/
+dist/
+apps/demo/public/
+packages/core/assets/
+packages/*/dist/
+packages/assets/raw/
+.python-deps/
+browser-tmp/
+browser-download-check.txt
+browser-trace.log
+consumer-check/
+reports/gallery/scenes.json
+*.tgz
+apps/android-test/android/.gradle/
+apps/android-test/android/local.properties
+apps/android-test/android/**/build/
