@@ -2,7 +2,7 @@ import type {AssetManifest,AstroAsset,GenerationResult,GeneratorConfig,SceneObje
 import {UniverseCompositionEvaluator,bounds} from '../../composition/src/index';
 import {SeededRandom} from './SeededRandom';
 import {generateStars} from './StarGenerator';
-export const GENERATOR_VERSION='5.1.0';
+export const GENERATOR_VERSION='5.1.1';
 export class UniverseGenerator {
  readonly evaluator=new UniverseCompositionEvaluator();
  constructor(readonly manifest:AssetManifest){}
@@ -36,7 +36,7 @@ export class UniverseGenerator {
   const r=new SeededRandom(`${seed}:candidate:${i}`),objects:SceneObject[]=[];
   const add=(kind:AstroAsset['kind'],size:number,x:number,y:number,dominant=false,brightness=1,rotation=0,assetId?:string)=>{
    const a=assetId?this.manifest.assets.find(a=>a.id===assetId)!:this.choose(kind,dominant?new SeededRandom(seed+':focal'):r,c,objects.filter(o=>o.kind===kind).map(o=>o.assetId),dominant);
-   const o:SceneObject={assetId:a.id,kind,size,x,y,dominant,brightness,rotation,depth:kind==='nebula'?.2:kind==='galaxy'?.55:.9,blendMode:kind==='nebula'?'screen':'normal'};
+   const o:SceneObject={assetId:a.id,kind,size,x,y,dominant,brightness,rotation,depth:kind==='nebula'?.2:kind==='galaxy'?.55:.9,blendMode:kind==='planet'?'normal':'screen'};
    if(kind==='planet')this.fitPlanet(o,c);objects.push(o);return o;
   };
   // A connected photographic landscape spans the frame instead of isolated stickers.

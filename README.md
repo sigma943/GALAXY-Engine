@@ -1,4 +1,4 @@
-# Galaxy Engine 5.1 + Galaxy Lab
+# Galaxy Engine 5.1.1 + Galaxy Lab
 
 Osobny silnik fotograficznego kosmosu w TypeScript i samodzielne laboratorium Vite/Capacitor. Jedna globalna scena, jeden canvas; React jest opcjonalnym adapterem. Repozytorium aplikacji przystankowej nie zostało zmodyfikowane.
 
@@ -8,7 +8,7 @@ Pierwsza wersja 5.0 przeszła testy techniczne i kompilację APK, ale została o
 
 Wersja 5.1 usuwa cały symulator przystanków, duże opisy obiektów i stały pasek z oceną. Kontrolki są niewielkie; ustawienia otwierają się na żądanie. Czysty widok nie zawiera żadnych widocznych przycisków, a dotknięcie ekranu przywraca sterowanie.
 
-Nowy generator komponuje duże galaktyki i rozległe fotograficzne warstwy pyłu/mgławic, z gęstszym polem gwiazd. Zdjęcia galaktyk mają warianty do 4096 px, ostrość lokalną i maski wyznaczane z konturu emisji, bez geometrycznych elips. Mgławice wykorzystują mieszanie screen. Galaktyki zachowują ciemne pasma pyłu wewnątrz swojej sylwetki i przezroczyste tło; planety zachowują normalny tryb oraz rzeczywistą sylwetkę. Saturn pochodzi teraz z wysokiej rozdzielczości mozaiki Cassini PIA06193. Dwa materiały (M104 i NGC3982) zostały wyłączone z generatora po kontroli wizualnej masek; ich obecne tło nie wtapia się wystarczająco dobrze w mgławice.
+Nowy generator komponuje duże galaktyki i rozległe fotograficzne warstwy pyłu/mgławic, z gęstszym polem gwiazd. Zdjęcia galaktyk mają warianty do 4096 px, ostrość lokalną i maski wyznaczane z konturu emisji, bez geometrycznych elips. Galaktyki i mgławice wykorzystują mieszanie screen, aby ciemne tło źródłowych fotografii nie tworzyło prostokątnych plam nad pozostałymi strukturami. Planety zachowują normalny tryb oraz rzeczywistą sylwetkę. Saturn pochodzi teraz z wysokiej rozdzielczości mozaiki Cassini PIA06193. Dwa materiały (M104 i NGC3982) zostały wyłączone z generatora po kontroli wizualnej masek; ich obecne tło nie wtapia się wystarczająco dobrze w mgławice.
 
 Heurystyka kompozycji odrzuca kadry z niewystarczającym pokryciem widocznymi strukturami i zbyt małym kontrastem. Punktacja pozostaje diagnostyką i nie dowodzi zgodności estetycznej z referencją. Przed wydaniem trzeba przejrzeć rzeczywiste zrzuty WebGL z bieżącego uruchomienia CI.
 
@@ -186,8 +186,8 @@ Symulator przystanków został usunięty na żądanie użytkownika. Otwieranie/z
 npm run build:engine
 npm run pack:engine
 # w oddzielnym projekcie:
-npm install /path/galaxy-engine-core-5.1.0.tgz
-npm install /path/galaxy-engine-react-5.1.0.tgz
+npm install /path/galaxy-engine-core-5.1.1.tgz
+npm install /path/galaxy-engine-react-5.1.1.tgz
 ```
 
 Pakiety zawierają ESM i deklaracje TypeScript. Core zawiera także `assets/manifest.json`, tekstury i podpisy. Skopiuj `node_modules/@galaxy-engine/core/assets` do `public/galaxy-assets` swojej aplikacji. Nie kopiuj Galaxy Lab.
